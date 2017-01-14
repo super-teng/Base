@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--指定当前配置文件与我们的bankDao相互对应上 -->
+<mapper namespace="dao.BankDao">
+
+    <select id="searchOneByUserName" parameterType="String" resultType="Bank">
+        select * from bank where username = #{username};
+    </select>
+    <select id="searchAll" resultType="Bank">
+        select * from bank;
+    </select>
+</mapper>

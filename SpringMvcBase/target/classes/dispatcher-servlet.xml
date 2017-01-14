@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+       http://www.springframework.org/schema/context
+	   http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+    <!--装在handler所依赖的类进入容器，这样requestmapping就可以进行使用了-->
+    <mvc:annotation-driven />
+    <!--因为我们的配置文件中配置的是拦截所有的请求，我们在这里去显示声明一下不去拦截的静态资源信息 -->
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
+    <mvc:resources mapping="/upload/**" location="/upload/"/>
+    <!--扫描的控制层包 因为和spring容器中存在父子容器的关系所以我们把控制层写在子容器中 -->
+    <context:component-scan base-package="pathUrl"/>
+    <context:component-scan base-package="url"/>
+    <context:component-scan base-package="requestUrl"/>
+    <context:component-scan base-package="validator.controller"/>
+    <context:component-scan base-package="base"/>
+    <context:component-scan base-package="file.upload"/>
+    <context:component-scan base-package="file.download"/>
+    <!--配置返回视图路径的拆分，自动加上一个前缀和后缀这样我们写一个页面直接就加上去了 -->
+    <bean class ="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix"  value="/WEB-INF/pages/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="urf-8"/>
+        <property name="maxUploadSize" value="10485760000"/>
+        <property name="maxInMemorySize" value="4096"/>
+    </bean>
+    <!--自定义一个拦截器，只用于拦截/userCenter下的方法 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/userCenter"/>
+            <bean class="interceptor.MyInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/download"/>
+            <bean class="interceptor.UploadInterceptor"/>
+        </mvc:interceptor>
+
+    </mvc:interceptors>
+    <!--国际化的时候才进行使用
+    配置校验器的具体实现，使用hibernateValidator的实现，校验信息使用另一个类的依赖 -->
+    <!--
+     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+        <property name="validationMessageSource" ref="messageSource"/>
+    </bean>
+    -->
+
+    <!--校验信息的使用 -->
+    <!--
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"/>
+    -->
+</beans>
